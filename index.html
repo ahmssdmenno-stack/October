@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>عداد الفريضة العسكرية</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@500;700;800;900&family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-deep:#181b13;
+    --olive:#333a24;
+    --olive-light:#454e30;
+    --khaki:#8a8362;
+    --sand:#d8cba6;
+    --gold:#c9a227;
+    --gold-bright:#e3ba3b;
+    --cream:#f3eedd;
+    --danger:#6b2b25;
+    --dim:#4a4a3d;
+  }
+
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+
+  body{
+    margin:0;
+    min-height:100vh;
+    background:
+      radial-gradient(circle at 20% -10%, #2a2f1e 0%, transparent 55%),
+      radial-gradient(circle at 100% 110%, #232717 0%, transparent 50%),
+      var(--bg-deep);
+    color:var(--cream);
+    font-family:'Tajawal', sans-serif;
+    padding:28px 16px 60px;
+  }
+
+  .wrap{max-width:720px; margin:0 auto;}
+
+  header{text-align:center; margin-bottom:28px;}
+
+  .eyebrow{
+    font-family:'Cairo', sans-serif;
+    font-weight:700;
+    letter-spacing:2px;
+    color:var(--khaki);
+    font-size:13px;
+    text-transform:uppercase;
+    margin-bottom:6px;
+  }
+
+  h1{
+    font-family:'Cairo', sans-serif;
+    font-weight:900;
+    font-size:clamp(24px, 6vw, 34px);
+    margin:0 0 4px;
+    color:var(--cream);
+    letter-spacing:0.5px;
+  }
+  .subtitle{
+    font-family:'Tajawal', sans-serif;
+    font-size:13.5px;
+    color:var(--khaki);
+    margin-bottom:18px;
+  }
+
+  .hero-number{
+    font-family:'Cairo', sans-serif;
+    font-weight:900;
+    font-size:clamp(64px, 22vw, 108px);
+    line-height:1;
+    color:var(--gold-bright);
+    text-shadow:0 0 30px rgba(201,162,39,0.25);
+    transition:transform .15s ease;
+  }
+  .hero-number.pulse{transform:scale(1.06);}
+
+  .hero-label{
+    font-family:'Cairo', sans-serif;
+    font-weight:700;
+    font-size:15px;
+    color:var(--sand);
+    margin-top:4px;
+  }
+
+  .ribbon-wrap{
+    margin:24px 0 8px;
+    background:var(--olive);
+    border:1px solid var(--olive-light);
+    border-radius:10px;
+    padding:14px 16px;
+    position:relative;
+    overflow:hidden;
+  }
+  .ribbon-track{
+    height:16px;
+    border-radius:8px;
+    background:repeating-linear-gradient(135deg, #23271a 0px, #23271a 6px, #1d2016 6px, #1d2016 12px);
+    overflow:hidden;
+    border:1px solid rgba(0,0,0,0.4);
+  }
+  .ribbon-fill{
+    height:100%;
+    width:0%;
+    background:linear-gradient(90deg, var(--gold) 0%, var(--gold-bright) 100%);
+    box-shadow:0 0 12px rgba(227,186,59,0.5);
+    transition:width .6s cubic-bezier(.22,1,.36,1);
+    border-radius:8px 0 0 8px;
+  }
+  .ribbon-stats{
+    display:flex;
+    justify-content:space-between;
+    margin-top:10px;
+    font-family:'Cairo', sans-serif;
+    font-weight:700;
+    font-size:13px;
+    color:var(--sand);
+  }
+  .ribbon-stats b{color:var(--gold-bright); font-size:15px;}
+
+  .grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill, minmax(64px, 1fr));
+    gap:10px;
+    margin-top:30px;
+  }
+
+  .tag{
+    position:relative;
+    aspect-ratio:1/1.25;
+    background:linear-gradient(160deg, var(--olive-light), var(--olive));
+    border:1.5px solid var(--khaki);
+    border-radius:12px 12px 16px 16px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+    user-select:none;
+    transition:transform .12s ease, border-color .2s ease, background .2s ease, opacity .2s ease;
+  }
+  .tag::before{
+    content:'';
+    position:absolute;
+    top:-6px;
+    width:11px;
+    height:11px;
+    border-radius:50%;
+    background:var(--bg-deep);
+    border:2px solid var(--khaki);
+  }
+  .tag:active{transform:scale(0.92);}
+
+  .tag.future{
+    opacity:0.45;
+    cursor:not-allowed;
+    border-color:var(--dim);
+  }
+  .tag.future:active{transform:none;}
+
+  .tag .num{
+    font-family:'Cairo', sans-serif;
+    font-weight:800;
+    font-size:16px;
+    color:var(--sand);
+    transition:color .2s ease, opacity .2s ease;
+  }
+  .tag .dlabel{
+    font-family:'Tajawal', sans-serif;
+    font-weight:500;
+    font-size:9px;
+    color:var(--khaki);
+    margin-top:2px;
+    transition:opacity .2s ease;
+  }
+
+  .tag.done{
+    background:linear-gradient(160deg, #4a4222, #6b5a1c);
+    border-color:var(--gold-bright);
+  }
+  .tag.done .num, .tag.done .dlabel{opacity:0;}
+
+  .stamp{
+    position:absolute;
+    inset:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    opacity:0;
+    transform:scale(1.5) rotate(-14deg);
+    transition:opacity .18s ease, transform .18s ease;
+    pointer-events:none;
+  }
+  .tag.done .stamp{
+    opacity:1;
+    transform:scale(1) rotate(-10deg);
+  }
+  .stamp svg{width:70%; height:70%;}
+
+  .note{
+    text-align:center;
+    margin-top:34px;
+    font-size:12.5px;
+    color:var(--khaki);
+    line-height:1.9;
+  }
+
+  .reset-btn{
+    display:block;
+    margin:26px auto 0;
+    background:transparent;
+    border:1.5px solid var(--danger);
+    color:#d98c83;
+    font-family:'Cairo', sans-serif;
+    font-weight:700;
+    font-size:13px;
+    padding:9px 22px;
+    border-radius:999px;
+    cursor:pointer;
+    transition:background .2s ease;
+  }
+  .reset-btn:active{background:rgba(107,43,37,0.3);}
+
+  @media (prefers-reduced-motion: reduce){
+    *{transition:none !important;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="eyebrow">عد تنازلي</div>
+    <h1>عداد الفريضة</h1>
+    <div class="subtitle" id="rangeLabel">من ٩ سبتمبر لحد ٤ أكتوبر</div>
+    <div class="hero-number" id="heroNumber">--</div>
+    <div class="hero-label" id="heroLabel">يوم باقي على يوم الحرية</div>
+  </header>
+
+  <div class="ribbon-wrap">
+    <div class="ribbon-track"><div class="ribbon-fill" id="ribbonFill"></div></div>
+    <div class="ribbon-stats">
+      <span>خلص: <b id="pctDone">0%</b></span>
+      <span>باقي: <b id="pctLeft">100%</b></span>
+    </div>
+  </div>
+
+  <div class="grid" id="grid"></div>
+
+  <div class="note">كل يوم بيتحقق لوحده أول ما الساعة توصل ٨ بالليل. تقدر تصحح أي يوم فات بإيدك لو عايز. الأيام الجاية متقفلة لحد ما توصلها.</div>
+  <button class="reset-btn" id="resetBtn">إعادة الضبط التلقائي</button>
+</div>
+
+<script>
+// ---- Date range: today -> Nov 25, 2026 ----
+const START_DATE = new Date(2026, 9, 9);   // Oct 9, 2026
+const END_DATE   = new Date(2026, 9, 28); // Oct 28, 2026
+START_DATE.setHours(0,0,0,0);
+END_DATE.setHours(0,0,0,0);
+
+const MS_DAY = 24 * 60 * 60 * 1000;
+const TOTAL = Math.round((END_DATE - START_DATE) / MS_DAY) + 1;
+
+const ARABIC_MONTHS = ['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
+
+function dateForIndex(i){
+  const d = new Date(START_DATE);
+  d.setDate(d.getDate() + i);
+  return d;
+}
+function deadlineForIndex(i){ // 8 PM of that day
+  const d = dateForIndex(i);
+  d.setHours(20,0,0,0);
+  return d;
+}
+function formatArabicDate(d){
+  return d.getDate() + ' ' + ARABIC_MONTHS[d.getMonth()];
+}
+
+const STORAGE_KEY = 'military-countdown-days-oct8-oct28';
+let checked = new Array(TOTAL).fill(false);
+let autoApplied = new Array(TOTAL).fill(false);
+
+const grid = document.getElementById('grid');
+const heroNumber = document.getElementById('heroNumber');
+const heroLabel = document.getElementById('heroLabel');
+const ribbonFill = document.getElementById('ribbonFill');
+const pctDone = document.getElementById('pctDone');
+const pctLeft = document.getElementById('pctLeft');
+const resetBtn = document.getElementById('resetBtn');
+const rangeLabel = document.getElementById('rangeLabel');
+
+rangeLabel.textContent = 'من ' + formatArabicDate(START_DATE) + ' لحد ' + formatArabicDate(END_DATE);
+
+// ---- Sound ----
+let audioCtx = null;
+function getCtx(){
+  if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  return audioCtx;
+}
+function playStampSound(){
+  const ctx = getCtx();
+  const now = ctx.currentTime;
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+  osc.type = 'sine';
+  osc.frequency.setValueAtTime(180, now);
+  osc.frequency.exponentialRampToValueAtTime(60, now + 0.18);
+  gain.gain.setValueAtTime(0.35, now);
+  gain.gain.exponentialRampToValueAtTime(0.001, now + 0.22);
+  osc.connect(gain).connect(ctx.destination);
+  osc.start(now);
+  osc.stop(now + 0.25);
+
+  const click = ctx.createOscillator();
+  const clickGain = ctx.createGain();
+  click.type = 'square';
+  click.frequency.setValueAtTime(900, now);
+  clickGain.gain.setValueAtTime(0.06, now);
+  clickGain.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
+  click.connect(clickGain).connect(ctx.destination);
+  click.start(now);
+  click.stop(now + 0.06);
+}
+function playUncheckSound(){
+  const ctx = getCtx();
+  const now = ctx.currentTime;
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+  osc.type = 'triangle';
+  osc.frequency.setValueAtTime(300, now);
+  osc.frequency.exponentialRampToValueAtTime(500, now + 0.08);
+  gain.gain.setValueAtTime(0.15, now);
+  gain.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
+  osc.connect(gain).connect(ctx.destination);
+  osc.start(now);
+  osc.stop(now + 0.12);
+}
+
+// ---- Storage ----
+async function loadState(){
+  try{
+    const res = await window.storage.get(STORAGE_KEY, false);
+    if(res && res.value){
+      const parsed = JSON.parse(res.value);
+      if(parsed && Array.isArray(parsed.checked) && parsed.checked.length === TOTAL){
+        checked = parsed.checked;
+        autoApplied = parsed.autoApplied && parsed.autoApplied.length === TOTAL ? parsed.autoApplied : autoApplied;
+      }
+    }
+  }catch(e){ /* first run, nothing saved yet */ }
+}
+async function saveState(){
+  try{
+    await window.storage.set(STORAGE_KEY, JSON.stringify({checked, autoApplied}), false);
+  }catch(e){ console.error('تعذر الحفظ', e); }
+}
+
+function stampSVG(){
+  return '<svg viewBox="0 0 24 24" fill="none">' +
+    '<circle cx="12" cy="12" r="11" stroke="#e3ba3b" stroke-width="1.6"/>' +
+    '<path d="M6.5 12.5l3.5 3.5 7.5-8" stroke="#e3ba3b" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>' +
+    '</svg>';
+}
+
+function isFuture(i){
+  return new Date() < deadlineForIndex(i) && !checked[i];
+}
+
+function buildGrid(){
+  grid.innerHTML = '';
+  for(let i = 0; i < TOTAL; i++){
+    const day = i + 1;
+    const d = dateForIndex(i);
+    const tag = document.createElement('div');
+    tag.className = 'tag' + (checked[i] ? ' done' : '') + (isFuture(i) ? ' future' : '');
+    tag.dataset.index = i;
+    tag.innerHTML = '<span class="num">' + day + '</span>' +
+      '<span class="dlabel">' + formatArabicDate(d) + '</span>' +
+      '<span class="stamp">' + stampSVG() + '</span>';
+    tag.addEventListener('click', () => onTagClick(i, tag));
+    grid.appendChild(tag);
+  }
+}
+
+function refreshTag(i){
+  const el = grid.querySelector('[data-index="' + i + '"]');
+  if(!el) return;
+  el.classList.toggle('done', checked[i]);
+  el.classList.toggle('future', isFuture(i));
+}
+
+function onTagClick(i, el){
+  if(isFuture(i)) return; // locked until its 8 PM
+  checked[i] = !checked[i];
+  autoApplied[i] = true; // manual action counts as resolved
+  refreshTag(i);
+  if(checked[i]) playStampSound(); else playUncheckSound();
+  updateStats();
+  saveState();
+}
+
+function updateStats(){
+  const doneCount = checked.filter(Boolean).length;
+  const leftCount = TOTAL - doneCount;
+  const donePct = Math.round((doneCount / TOTAL) * 100);
+  const leftPct = 100 - donePct;
+
+  ribbonFill.style.width = donePct + '%';
+  pctDone.textContent = donePct + '%';
+  pctLeft.textContent = leftPct + '%';
+
+  heroNumber.textContent = leftCount;
+  heroNumber.classList.add('pulse');
+  setTimeout(() => heroNumber.classList.remove('pulse'), 150);
+
+  heroLabel.textContent = leftCount === 0
+    ? 'مبروك الحرية! 🎉'
+    : (leftCount === 1 ? 'يوم واحد باقي بس!' : 'يوم باقي على يوم الحرية');
+}
+
+// Auto-check any day whose 8 PM deadline has passed, once each, and play the sound
+function runAutoCheck(playSound){
+  const now = new Date();
+  let anyNew = false;
+  for(let i = 0; i < TOTAL; i++){
+    if(!autoApplied[i] && now >= deadlineForIndex(i)){
+      checked[i] = true;
+      autoApplied[i] = true;
+      refreshTag(i);
+      anyNew = true;
+      if(playSound) playStampSound();
+    } else {
+      refreshTag(i); // keep future/lock styling in sync as time passes
+    }
+  }
+  if(anyNew){
+    updateStats();
+    saveState();
+  }
+}
+
+resetBtn.addEventListener('click', () => {
+  if(!confirm('متأكد إنك عايز تصفّر أي تعديل يدوي وترجع للوضع التلقائي؟')) return;
+  autoApplied = new Array(TOTAL).fill(false);
+  checked = new Array(TOTAL).fill(false);
+  buildGrid();
+  runAutoCheck(false);
+  updateStats();
+  saveState();
+});
+
+(async function init(){
+  await loadState();
+  buildGrid();
+  runAutoCheck(false); // catch up silently on page load, no sound spam
+  updateStats();
+  // check every minute for the 8 PM crossing while the page stays open
+  setInterval(() => runAutoCheck(true), 60 * 1000);
+})();
+</script>
+</body>
+</html>
